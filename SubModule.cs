@@ -8,10 +8,13 @@ namespace MercFix
     {
         protected override void OnGameStart(Game game, IGameStarter gameStarterObject)
         {
-            Campaign campaign = game.GameType as Campaign;
-            if (campaign == null) return;
-            CampaignGameStarter gameInitializer = (CampaignGameStarter)gameStarterObject;
-            gameInitializer.AddBehavior(new MercFix());
+            // Check that the game type is a campaign and return if it isn't.
+            if (game.GameType as Campaign == null)
+            {
+                return;
+            }
+            // Add mod behavior.
+            ((CampaignGameStarter)gameStarterObject).AddBehavior(new MercFix());
         }
     }
 }
