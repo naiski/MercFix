@@ -1,6 +1,7 @@
 ﻿using System;
 using TaleWorlds.Core;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.Actions;
 
 namespace MercFix
 {
@@ -22,7 +23,7 @@ namespace MercFix
         private void EndMercContract()
         {
             // Remove the player clan from their associated kingdom.  Note that the player's banner and potentially other factors do not update until a menu is open and closed.  Maybe try to fix this in the future?
-            Clan.PlayerClan.ClanLeaveKingdom(true);
+            ChangeKingdomAction.ApplyByLeaveKingdomAsMercenaryForNoPayment(Clan.PlayerClan, Clan.PlayerClan.Kingdom);
             InformationManager.DisplayMessage(new InformationMessage("You have ended your mercenary contract."));
         }
 
