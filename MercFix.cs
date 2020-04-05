@@ -7,6 +7,8 @@ namespace MercFix
 {
     public class MercFix : CampaignBehaviorBase
     {
+        string lastMenu = null;
+
         public override void RegisterEvents()
         {
             CampaignEvents.OnSessionLaunchedEvent.AddNonSerializedListener(this, new Action<CampaignGameStarter>(this.OnSessionLaunched));
@@ -16,15 +18,29 @@ namespace MercFix
         private void RenewMercContract(MenuCallbackArgs args)
         {
             Clan.PlayerClan.LastFactionChangeTime = CampaignTime.Now;
-            GameMenu.ExitToLast();
             InformationManager.DisplayMessage(new InformationMessage("You have renewed your mercenary contract."));
+            if (null == lastMenu)
+            {
+                GameMenu.ExitToLast();
+            }
+            else
+            {
+                GameMenu.SwitchToMenu(lastMenu);
+            }
         }
 
         private void EndMercContract(MenuCallbackArgs args)
         {
             Clan.PlayerClan.ClanLeaveKingdom(true);
-            GameMenu.ExitToLast();
             InformationManager.DisplayMessage(new InformationMessage("You have ended your mercenary contract."));
+            if (null == lastMenu)
+            {
+                GameMenu.ExitToLast();
+            }
+            else
+            {
+                GameMenu.SwitchToMenu(lastMenu);
+            }
         }
 
         private void OnSessionLaunched(CampaignGameStarter obj)
@@ -42,7 +58,7 @@ namespace MercFix
                 "Renew the contract.",
                 null,
                 this.RenewMercContract,
-                true,
+                false,
                 0,
                 false);
             obj.AddGameMenuOption(
@@ -51,7 +67,7 @@ namespace MercFix
                 "End the contract.",
                 null,
                 this.EndMercContract,
-                true,
+                false,
                 1,
                 false);
         }
@@ -60,7 +76,15 @@ namespace MercFix
         {
             if (Clan.PlayerClan.IsUnderMercenaryService && Clan.PlayerClan.LastFactionChangeTime.ElapsedDaysUntilNow >= 30)
             {
-                GameMenu.ActivateGameMenu("merc_contract_expiration");
+                if (null == Campaign.Current.CurrentMenuContext)
+                {
+                    lastMenu = null;
+                    GameMenu.ActivateGameMenu("merc_contract_expiration");
+                }
+                else
+                {
+                    lastMenu = Campaign.Current.CurrentMenuContext.GameMenu.StringId;
+                }
                 GameMenu.SwitchToMenu("merc_contract_expiration");
             }
         }
